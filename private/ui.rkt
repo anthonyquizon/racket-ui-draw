@@ -3,7 +3,7 @@
 (require racket/gui/base  
          racket/draw
          racket/match
-         (prefix-in n: "../nodes.rkt"))
+         (prefix-in n: ui-draw/node))
 
 (provide setup!
          render!)
@@ -15,7 +15,9 @@
 (define width 600)
 (define height 480)
 
-(define (setup! on-keyboard)
+(define (setup! label handlers)
+  (define on-keyboard (hash-ref handlers 'on-keyboard identity))
+
   (define main-canvas%
     (class canvas%
       (define/override (on-event event) null)
@@ -24,7 +26,7 @@
       (super-new)))
    
   (set! frame (new frame% 
-                   [label "Illustrations and Diagrams"]
+                   [label label]
                    [width width]
                    [height height]))
 

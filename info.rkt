@@ -1,4 +1,5 @@
 #lang info
+(define name "ui-draw")
 (define collection "ui-draw")
 (define deps '("base"))
 (define build-deps '("scribble-lib" "racket-doc" "rackunit-lib"))

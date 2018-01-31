@@ -2,7 +2,6 @@
 
 (require racket/gui/base)
 
-(require (prefix-in m: "../model.rkt"))
 (provide setup! 
          dispatch!)
 

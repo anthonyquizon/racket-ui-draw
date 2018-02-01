@@ -30,9 +30,17 @@
 (define handlers 
   (make-hash `((on-keyboard . ,on-keyboard))))
 
+(define (rectangle x y) 
+  (define p1 ())
+  (n:node `() `(n:line ))
+  )
+
 (define (model->nodes model)
   (match-define (list x y _) (Model-pos model))
-  (n:node `(,(n:scale 2 2)) `(,(n:point (* x 10) (* y 10)))))
+  (n:node 
+    `(,(n:scale 2 2)) 
+    `(,(n:node )
+      ,(n:point (* x 10) (* y 10)))))
 
 (define (run!) 
   (d:run! #:label "hello"
@@ -40,5 +48,5 @@
           #:model->nodes model->nodes
           #:handlers handlers))
 
-;(module+ main 
-  ;(run!))
+(module+ main 
+  (run!))

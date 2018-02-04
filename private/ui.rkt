@@ -39,55 +39,54 @@
 
 (define noEff '())
 
-(define (path->drawEff dc point)
+(define (path->drawEff dc path)
   (define p (new dc-path%))
-  (define ops (n:path-ops))
+  (define ops (n:path-ops path))
 
   (for-each 
     (lambda (op)
       (match op
         [(n:move x y) (send p move-to x y)]
         [(n:line x y) (send p line-to x y)]
-        [(n:curve x1 y1 x2 y2 x3 y3) (send p curve-to x1 y1 x2 y2 x3 y3)]))
+        [(n:curve x1 y1 x2 y2 x3 y3) (send p curve-to x1 y1 x2 y2 x3 y3)]
+        [_ noEff]))
     ops)
   
   (send dc draw-path p))
 
-(define (scale->drawEff dc s)
-  (send dc scale (n:scale-x s) (n:scale-y s)))
-
-(define (translate->drawEff dc s)
-  (send dc translate (n:translate-x s) (n:translate-y s)))
+(define (arc->drawEff dc arc)
+  (match-define (n:arc x y w h r0 r1) arc)
+  (send dc draw-arc x y w h r0 r1))
 
 (define (props->transform dc props)
-  (for ([prop props])
-    (cond
-      [(n:scale? prop) (scale->drawEff dc prop)]
-      [(n:translate? prop) (translate->drawEff dc prop)]
-      [else noEff]))
+  (for-each 
+    (lambda (prop)
+      (match prop
+        [(n:scale x y) (send dc scale x y)]
+        [(n:translate x y) (send dc translate x y)]
+        [_ noEff]))
+    props)
+
   (send dc get-transformation))
 
-(define (props->brush dc props)
-  (for ([prop props])
-    (cond
-      [(n:fill? prop) (scale->drawEff dc prop)]
-      [(n:stroke? prop) (translate->drawEff dc prop)]
-      [else noEff]))
-  (send dc get-brush))
+;(define (props->brush dc props)
+  ;TODO
+  ;(send dc get-brush))
 
 (define (node->drawEff dc state node)
   (define props (n:node-props root)) 
   (define children (n:node-children root)) 
 
-  (define transform (props->transform props))
-  (define brush (props->brush props))
+  ;(define transform (props->transform props))
+  ;(define brush (props->brush props))
 
   (for ([child children])
-    (send dc set-transformation)
-    (send dc set-brush)
+    ;(send dc set-transformation)
+    ;(send dc set-brush)
 
     (cond 
       [(n:path? child) (path->drawEff dc child)]
+      [(n:arc? child) (arc->drawEff dc child)]
       [(n:node? child) (node->drawEff dc child)]
       [else noEff])))
 

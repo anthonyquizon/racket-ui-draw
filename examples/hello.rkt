@@ -3,6 +3,7 @@
 (require (prefix-in d: ui-draw)
          (prefix-in n: ui-draw/node)
          (prefix-in r: ui-draw/reconciler)
+         (prefix-in s: ui-draw/shapes)
          racket/match)
 
 (provide on-keyboard)
@@ -30,17 +31,11 @@
 (define handlers 
   (make-hash `((on-keyboard . ,on-keyboard))))
 
-(define (rectangle x y) 
-  (define p1 ())
-  (n:node `() `(n:line ))
-  )
-
 (define (model->nodes model)
   (match-define (list x y _) (Model-pos model))
   (n:node 
     `(,(n:scale 2 2)) 
-    `(,(n:node )
-      ,(n:point (* x 10) (* y 10)))))
+    `(,(s:circle (* x 10) (* y 10) 5))))
 
 (define (run!) 
   (d:run! #:label "hello"

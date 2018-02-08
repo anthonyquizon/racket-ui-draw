@@ -3,6 +3,7 @@
 (require racket/gui/base  
          racket/draw
          racket/match
+         (prefix-in f: racket/function)  
          (prefix-in n: ui-draw/node))
 
 (provide setup!
@@ -16,7 +17,7 @@
 (define height 480)
 
 (define (setup! label handlers)
-  (define on-keyboard (hash-ref handlers 'on-keyboard identity))
+  (define on-keyboard (hash-ref handlers 'on-keyboard (lambda () f:identity)))
 
   (define main-canvas%
     (class canvas%
@@ -46,9 +47,9 @@
   (for-each 
     (lambda (op)
       (match op
-        [(n:move x y) (send p move-to x y)]
-        [(n:line x y) (send p line-to x y)]
-        [(n:curve x1 y1 x2 y2 x3 y3) (send p curve-to x1 y1 x2 y2 x3 y3)]
+        [(n:moveTo x y) (send p move-to x y)]
+        [(n:lineTo x y) (send p line-to x y)]
+        [(n:curveTo x0 y0 x1 y1 x2 y2) (send p curve-to x0 y0 x1 y1 x2 y2)]
         [_ noEff]))
     ops)
   
@@ -57,6 +58,10 @@
 (define (arc->drawEff dc arc)
   (match-define (n:arc x y w h r0 r1) arc)
   (send dc draw-arc x y w h r0 r1))
+
+(define (line->drawEff dc arc)
+  (match-define (n:line x0 y0 x1 y1) line)
+  (send dc draw-line x0 y0 x1 y1))
 
 (define (props->transform dc props)
   (for-each 
@@ -74,8 +79,8 @@
   ;(send dc get-brush))
 
 (define (node->drawEff dc state node)
-  (define props (n:node-props root)) 
-  (define children (n:node-children root)) 
+  (define props (n:node-props node)) 
+  (define children (n:node-children node)) 
 
   ;(define transform (props->transform props))
   ;(define brush (props->brush props))
@@ -87,7 +92,7 @@
     (cond 
       [(n:path? child) (path->drawEff dc child)]
       [(n:arc? child) (arc->drawEff dc child)]
-      [(n:node? child) (node->drawEff dc child)]
+      [(n:node? child) (node->drawEff dc state child)]
       [else noEff])))
 
 (define (on-paint canvas dc)

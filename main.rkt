@@ -8,7 +8,7 @@
 (define (run! #:label label
               #:initial-model initial-model 
               #:model->nodes model->nodes 
-              #:handlers handlers)
+              #:handlers [handlers (make-hash null)])
   (ui:setup! label handlers)
   (r:setup!
     initial-model

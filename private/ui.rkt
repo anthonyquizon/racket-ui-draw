@@ -59,7 +59,7 @@
   (match-define (n:arc x y w h r0 r1) arc)
   (send dc draw-arc x y w h r0 r1))
 
-(define (line->drawEff dc arc)
+(define (line->drawEff dc line)
   (match-define (n:line x0 y0 x1 y1) line)
   (send dc draw-line x0 y0 x1 y1))
 
@@ -92,6 +92,7 @@
     (cond 
       [(n:path? child) (path->drawEff dc child)]
       [(n:arc? child) (arc->drawEff dc child)]
+      [(n:line? child) (line->drawEff dc child)]
       [(n:node? child) (node->drawEff dc state child)]
       [else noEff])))
 
